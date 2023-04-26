@@ -2,15 +2,31 @@ import SwiftUI
 import shared
 
 struct ContentView: View {
-	let greet = Greeting().greet()
+    @StateObject
+    var myViewModel: MyViewModel
+        
+    var body: some View {
+        VStack {
+            TickerView(
+                tickValue: myViewModel.tickValue,
+                onStart: { myViewModel.startTicker() },
+                onCancel: { myViewModel.cancelTicker() }
+            )
 
-	var body: some View {
-		Text(greet)
-	}
+            Divider()
+            
+            GreetingWithProgressView(
+                progress: myViewModel.progress,
+                greetingText: myViewModel.greetingText,
+                onLoad: { myViewModel.loadGreeting() },
+                onCancel: { myViewModel.cancelGreeting() }
+            )
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
 	static var previews: some View {
-		ContentView()
+		ContentView(myViewModel: MyViewModel())
 	}
 }
