@@ -1,6 +1,7 @@
 package com.example.kmmsandbox.util
 
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -10,7 +11,7 @@ class SuspendWrapper<T>(private val block: suspend () -> T) {
         onSuccess: (item: T) -> Unit,
         onThrow: (error: Throwable) -> Unit
     ): Cancellable {
-        val job = GlobalScope.launch {
+        val job = GlobalScope.launch(Dispatchers.Main) {
             try {
                 onSuccess(block())
             } catch (error: Throwable) {

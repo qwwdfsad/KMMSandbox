@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 // Manual solution is to provide some sort of wrapper
 // Kmp-native-coroutines & Skie generate such wrappers automatically
 
-class GreetingService {
+class GreetingService : MyService() {
     private val platform: Platform = getPlatform()
 
     suspend fun greet(): String {
@@ -20,6 +20,7 @@ class GreetingService {
             if (i != 1) {
                 delay(0.3.seconds)
             }
+            failInErrorModeOn { i == 6 }
             _progressFlow.value = "$i/10"
         }
         return "Hello, ${platform.name}!"

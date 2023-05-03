@@ -11,6 +11,7 @@ import SwiftUI
 struct GreetingWithProgressView: View {
     let progress: String?
     let greetingText: String?
+    let greetingErrorMessage: String?
     let onLoad: () -> Void
     let onCancel: () -> Void
     
@@ -21,6 +22,9 @@ struct GreetingWithProgressView: View {
             HStack {
                 Button("Load", action: onLoad)
                 Button("Cancel", action: onCancel)
+            }
+            if let message = greetingErrorMessage {
+                Text(message)
             }
         }
     }
@@ -38,6 +42,7 @@ struct GreetingWithCountdownView_Previews: PreviewProvider {
         GreetingWithProgressView(
             progress: "",
             greetingText: "Hello",
+            greetingErrorMessage: nil,
             onLoad: {},
             onCancel: {}
         )

@@ -17,11 +17,15 @@ class MyViewModel: ObservableObject {
     private let tickerService = TickerService()
     private var tickerTask: Task<(), Never>? = nil
     private var cancellableTicker: Cancellable? = nil
-    
+
     @Published
     var tickValue: Int? = nil
     
+    @Published
+    var tickerErrorMessage: String = ""
+
     func startTicker() {
+        tickerErrorMessage = ""
         cancelTicker()
         tickerTask = Task {
             cancellableTicker = tickerService.launchTickClassFlow()
@@ -29,8 +33,9 @@ class MyViewModel: ObservableObject {
                     onEach: { tick in
                         self.tickValue = tick?.intValue
                     }, onComplete: { error in
-                        if error != nil {
+                        if let error = error {
                             self.tickValue = nil
+                            self.tickerErrorMessage = "'launchTickFlow' error: \(error.message ?? "")"
                         }
                     })
         }
@@ -53,22 +58,27 @@ class MyViewModel: ObservableObject {
     @Published
     var greetingText: String = ""
     
+    @Published
+    var greetingErrorMessage: String = ""
+
     func loadGreeting() {
+        greetingErrorMessage = ""
         cancelGreeting()
         greetingTask = Task {
             greetingText = "Loading..."
             // in this way, cancellation is not supported:
 //            greetingText = try await greetingService.greet()
-            
+
             // we need to add an explicit cancellable wrapper:
             cancellableGreeting = greetingService.greetWrapper().subscribe(onSuccess: { value in
                 if let value = value {
                     self.greetingText = String(value)
                 }
             }, onThrow: { error in
-                // we need to somehow filter out Kotlin CancellationException (which is not exposed by default)
-                // otherwise this line gets print with CancellationException:
-                // self.greetingText = "Error occurred: \(error)"
+                // TODO we should check for Kotlin Cancellation exception here,
+                // which is not exposed by default
+                // thus, we get cancellation errors
+                self.greetingErrorMessage = "'greet' call error: \(error.message ?? "")"
             })
         }
     }
@@ -91,14 +101,21 @@ class MyViewModel: ObservableObject {
                     } else {
                         self.progress = String(value ?? "")
                     }
-                    
+
                 },
                 onComplete: { error in
-                    if (error != nil) {
-                        self.greetingText = "Failed with error: \(error!)"
+                    if let error = error {
+                        self.greetingErrorMessage = "'progressFlow' error: \(error.message ?? "")"
                     }
                     self.progress = nil
                 })
         }
+    }
+
+    // error mode
+
+    func changeErrorMode(value: Bool) {
+        tickerService.changeErrorMode(value: value)
+        greetingService.changeErrorMode(value: value)
     }
 }
