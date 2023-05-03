@@ -20,12 +20,21 @@ class MyViewModel: ObservableObject {
     @Published
     var tickValue: Int? = nil
     
+    @Published
+    var tickerErrorMessage: String = ""
+
     func startTicker() {
+        tickerErrorMessage = ""
         cancelTicker()
         tickerTask = Task {
-            let tickAsyncSequence: SkieSwiftFlow<KotlinInt> = tickerService.launchTickFlow()
-            for await it in tickAsyncSequence {
-                tickValue = it.intValue
+            do {
+                let tickAsyncSequence: SkieSwiftFlow<KotlinInt> = tickerService.launchTickFlow()
+                for try await tick in tickAsyncSequence {
+                    tickValue = tick.intValue
+                }
+            } catch {
+                tickValue = nil
+                tickerErrorMessage = "'launchTickFlow' error: \(error.localizedDescription)"
             }
         }
     }
@@ -45,12 +54,21 @@ class MyViewModel: ObservableObject {
     @Published
     var greetingText: String = ""
     
+    @Published
+    var greetingErrorMessage: String = ""
+
     func loadGreeting() {
+        greetingErrorMessage = ""
         cancelGreeting()
         greetingTask = Task {
             greetingText = "Loading..."
-            // with skie, cancellation is supported:
-            greetingText = try await greetingService.greet()
+            do {
+                greetingText = try await greetingService.greet()
+            } catch {
+                //if !(error is CancellationError)  {
+                    greetingErrorMessage = "'greet' call error: \(error.localizedDescription)"
+                //}
+            }
         }
     }
 
@@ -70,5 +88,12 @@ class MyViewModel: ObservableObject {
                 progress = it
             }
         }
+    }
+
+    // error mode
+
+    func changeErrorMode(value: Bool) {
+        tickerService.changeErrorMode(value: value)
+        greetingService.changeErrorMode(value: value)
     }
 }

@@ -20,6 +20,8 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
+            binaryOption("bundleId", "com.example.kmmsandbox")
+            binaryOption("bundleVersion", "1")
         }
     }
 

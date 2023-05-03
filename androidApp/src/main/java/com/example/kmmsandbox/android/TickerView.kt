@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TickerView(
     tickValue: Int?,
+    tickerErrorMessage: String,
     onStart: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -27,6 +28,9 @@ fun TickerView(
                 Text("Cancel")
             }
         }
+        if (tickerErrorMessage.isNotEmpty()) {
+            Text(modifier = withPadding, text = tickerErrorMessage)
+        }
     }
 }
 
@@ -36,6 +40,7 @@ fun TickerPreview() {
     MyApplicationTheme {
         TickerView(
             tickValue = 10,
+            tickerErrorMessage = "Error",
             onStart = {},
             onCancel = {},
         )

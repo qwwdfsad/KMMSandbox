@@ -10,6 +10,7 @@ import SwiftUI
 
 struct TickerView: View {
     let tickValue: Int?
+    let tickerErrorMessage: String?
     let onStart: () -> Void
     let onCancel: () -> Void
     
@@ -20,12 +21,20 @@ struct TickerView: View {
                 Button("Start", action: onStart)
                 Button("Cancel", action: onCancel)
             }
+            if let message = tickerErrorMessage {
+                Text(message)
+            }
         }
     }
 }
 
 struct TickerView_Previews: PreviewProvider {
     static var previews: some View {
-        TickerView(tickValue: 10, onStart: {}, onCancel: {})
+        TickerView(
+            tickValue: 10,
+            tickerErrorMessage: nil,
+            onStart: {},
+            onCancel: {}
+        )
     }
 }
