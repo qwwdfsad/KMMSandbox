@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration.Companion.seconds
 
-class GreetingService {
+class GreetingService : MyService() {
     private val platform: Platform = getPlatform()
 
     @NativeCoroutines
@@ -15,6 +15,7 @@ class GreetingService {
             if (i != 1) {
                 delay(0.3.seconds)
             }
+            failInErrorModeOn { i == 6 }
             _progressFlow.value = "$i/10"
         }
         return "Hello, ${platform.name}!"

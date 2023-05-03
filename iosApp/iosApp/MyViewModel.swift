@@ -23,7 +23,11 @@ class MyViewModel: ObservableObject {
     @Published
     var tickValue: Int? = nil
     
+    @Published
+    var tickerErrorMessage: String = ""
+    
     func startTicker() {
+        tickerErrorMessage = ""
         cancelTicker()
         tickerTask = Task {
             do {
@@ -33,6 +37,7 @@ class MyViewModel: ObservableObject {
                 }
             } catch {
                 tickValue = nil
+                tickerErrorMessage = "'launchTickFlow' error: \(error.localizedDescription)"
             }
         }
     }
@@ -52,13 +57,25 @@ class MyViewModel: ObservableObject {
     @Published
     var greetingText: String = ""
     
+    @Published
+    var greetingErrorMessage: String = ""
+    
     func loadGreeting() {
+        greetingErrorMessage = ""
         cancelGreeting()
         greetingTask = Task {
             greetingText = "Loading..."
+            // alternative: to use do-catch and
+            // try await asyncFunction(for: greetingService.greet())
+            
             let result = await asyncResult(for: greetingService.greet())
-            if case let .success(text) = result {
+            switch result {
+            case let.success(text):
                 greetingText = text
+            case let.failure(error):
+                if !(error is CancellationError)  {
+                    greetingErrorMessage = "'greet' call error: \(error.localizedDescription)"
+                }
             }
         }
     }
@@ -79,9 +96,16 @@ class MyViewModel: ObservableObject {
                     progress = value
                 }
             } catch {
-                greetingText = "Failed with error: \(error)"
+                greetingErrorMessage = "'progressFlow' error: \(error.localizedDescription)"
                 progress = nil
             }
         }
+    }
+    
+    // error mode
+    
+    func changeErrorMode(value: Bool) {
+        tickerService.changeErrorMode(value: value)
+        greetingService.changeErrorMode(value: value)
     }
 }

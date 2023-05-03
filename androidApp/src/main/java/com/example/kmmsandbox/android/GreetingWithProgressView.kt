@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 fun GreetingWithProgressView(
     progress: String?,
     greetingText: String,
+    greetingErrorMessage: String,
     onLoad: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -34,6 +35,9 @@ fun GreetingWithProgressView(
                 Text("Cancel")
             }
         }
+        if (greetingErrorMessage.isNotEmpty()) {
+            Text(modifier = withPadding, text = greetingErrorMessage)
+        }
     }
 }
 
@@ -44,6 +48,7 @@ fun GreetingPreview() {
         GreetingWithProgressView(
             progress = "1/10",
             greetingText = "Hello, Android!",
+            greetingErrorMessage = "",
             onLoad = {},
             onCancel = {},
         )
